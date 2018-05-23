@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ray.dao.BookMapper">
+  <resultMap id="BaseResultMap" type="com.ray.entity.Book">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="book_name" jdbcType="VARCHAR" property="bookName" />
+    <result column="book_writer" jdbcType="VARCHAR" property="bookWriter" />
+    <result column="book_publisher" jdbcType="VARCHAR" property="bookPublisher" />
+    <result column="book_isrent" jdbcType="BIGINT" property="bookIsrent" />
+    <result column="book_person" jdbcType="VARCHAR" property="bookPerson" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, book_name, book_writer, book_publisher, book_isrent, book_person
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from book
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <!-- 模糊查询 -->
+  <select id="selectBookByName" parameterType="com.ray.entity.Book" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from book
+    where book_name like concat('%',#{bookName},'%')
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from book
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.ray.entity.Book">
+    insert into book (id, book_name, book_writer, 
+      book_publisher, book_isrent, book_person
+      )
+    values (#{id,jdbcType=BIGINT}, #{bookName,jdbcType=VARCHAR}, #{bookWriter,jdbcType=VARCHAR}, 
+      #{bookPublisher,jdbcType=VARCHAR}, #{bookIsrent,jdbcType=BIGINT}, #{bookPerson,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ray.entity.Book">
+    insert into book
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="bookName != null">
+        book_name,
+      </if>
+      <if test="bookWriter != null">
+        book_writer,
+      </if>
+      <if test="bookPublisher != null">
+        book_publisher,
+      </if>
+      <if test="bookIsrent != null">
+        book_isrent,
+      </if>
+      <if test="bookPerson != null">
+        book_person,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="bookName != null">
+        #{bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="bookWriter != null">
+        #{bookWriter,jdbcType=VARCHAR},
+      </if>
+      <if test="bookPublisher != null">
+        #{bookPublisher,jdbcType=VARCHAR},
+      </if>
+      <if test="bookIsrent != null">
+        #{bookIsrent,jdbcType=BIGINT},
+      </if>
+      <if test="bookPerson != null">
+        #{bookPerson,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ray.entity.Book">
+    update book
+    <set>
+      <if test="bookName != null">
+        book_name = #{bookName,jdbcType=VARCHAR},
+      </if>
+      <if test="bookWriter != null">
+        book_writer = #{bookWriter,jdbcType=VARCHAR},
+      </if>
+      <if test="bookPublisher != null">
+        book_publisher = #{bookPublisher,jdbcType=VARCHAR},
+      </if>
+      <if test="bookIsrent != null">
+        book_isrent = #{bookIsrent,jdbcType=BIGINT},
+      </if>
+      <if test="bookPerson != null">
+        book_person = #{bookPerson,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ray.entity.Book">
+    update book
+    set book_name = #{bookName,jdbcType=VARCHAR},
+      book_writer = #{bookWriter,jdbcType=VARCHAR},
+      book_publisher = #{bookPublisher,jdbcType=VARCHAR},
+      book_isrent = #{bookIsrent,jdbcType=BIGINT},
+      book_person = #{bookPerson,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <!-- 借书 -->
+  <update id="borrow" parameterType="com.ray.entity.Book">
+    update book
+    set book_isrent=1,book_person=#{borrow_person}
+    where id=#{id}
+  </update>
+  <!-- 还书 -->
+  <update id="returnBook" parameterType="com.ray.entity.Book">
+    update book
+    set book_isrent=0,book_person=''
+    where id=#{id}
+  </update>
+  <!-- 查看订阅的书 -->
+  <select id="selectBookByBorrowPerson" parameterType="com.ray.entity.Book" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    from book
+    where book_person=#{borrow_person}
+  </select>
+</mapper>
